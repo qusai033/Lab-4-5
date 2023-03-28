@@ -7,8 +7,6 @@
 #define desirefqz 16000
 
 void initPWMTimer3();
-
-
 void changeDutyCycle(float voltage);
 
 #endif
