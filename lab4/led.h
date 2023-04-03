@@ -2,7 +2,7 @@
 #define LED_H
 #include <avr/io.h>
 
-
-void initADC0();
+void initLEDs();
+void toogle_LEDs();
 
 #endif
