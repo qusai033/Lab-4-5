@@ -15,6 +15,12 @@ COUNTDOWNTRUE,
 COUNTDOWNFALSE
 } stateType;
 
+typedef enum states_ {
+  wait_press, debounce_press, wait_release, debounce_release
+} state;
+
+volatile state curState = wait_press;
+
 stateType activateTimer = COUNTDOWNFALSE;
 
 int main(){
@@ -44,7 +50,25 @@ segment--;
 }
 
 ISR(INT0_vect){
-  if(activateTimer == COUNTDOWNFALSE){
-  activateTimer = COUNTDOWNTRUE;
+  switch (curState)
+  {
+    case wait_press:
+      curState = debounce_press;
+      break;
+    case debounce_press:
+      curState = wait_release;
+      if(activateTimer == COUNTDOWNFALSE){
+        activateTimer = COUNTDOWNTRUE;
+      }
+      curState = debounce_release;
+      break;
+    // change the delay in wait release
+    case wait_release:
+      break;
+    case debounce_release:
+      curState = wait_press;
+      break;
+    default:
+      curState = wait_press;
   }
 }
