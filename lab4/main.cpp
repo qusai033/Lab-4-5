@@ -27,7 +27,9 @@ int main(){
     initTimer0();
     initTimer1();
     initSwitchPD0();
-    initSegments();
+    initPWMTimer3();
+    initADC0();
+    init7Segments();
     int segment = 9;
   sei(); // Enable global interrupts.
   
