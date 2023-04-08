@@ -62,7 +62,6 @@ ISR(INT0_vect){
       }
       curState = debounce_release;
       break;
-    // change the delay in wait release
     case wait_release:
       break;
     case debounce_release:
