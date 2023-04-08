@@ -36,17 +36,15 @@ int main(){
 // while loop
  while (1) { 
   if(activateTimer == COUNTDOWNTRUE){
-setSegments(segment);
-delayS(1);
-segment--;
+    turnOn7segments(segment);
+    delayS(1);
+    segment--;
     if(segment == -1){
       segment = 9;
       activateTimer = COUNTDOWNFALSE;
     } 
- }
- else{
-
- }
+  }
+  else{}
  }
   return 0;
 }
