@@ -52,4 +52,3 @@ void delayMs(unsigned int delay){
     }
     TCCR0B &= ~((1 << CS02) | (1 << CS01) | (1 << CS00)); //turn off clock
 }
-

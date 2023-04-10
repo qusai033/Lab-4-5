@@ -16,10 +16,11 @@ COUNTDOWNFALSE
 } stateType;
 
 typedef enum states_ {
-  wait_press, debounce_press, wait_release, debounce_release
+  WAIT_RELEASE,
+WAIT_PRESS,
+DEBOUNCE_PRESS,
+DEBOUNCE_RELEASE
 } state;
-
-volatile state curState = wait_press;
 
 stateType activateTimer = COUNTDOWNFALSE;
 
@@ -30,44 +31,56 @@ int main(){
     initPWMTimer3();
     initADC0();
     init7Segments();
+    Serial.begin(9600);
     int segment = 9;
   sei(); // Enable global interrupts.
   
 // while loop
  while (1) { 
   if(activateTimer == COUNTDOWNTRUE){
+    changeDutyCycle(2.5);
+    if(segment == -1){
+      segment = 9;
+    } 
     turnOn7segments(segment);
     delayS(1);
     segment--;
     if(segment == -1){
-      segment = 9;
+      turnOn7segments(segment);
       activateTimer = COUNTDOWNFALSE;
     } 
   }
-  else{}
+  else{
+    //Serial.println(ADC/200.0);
+    changeDutyCycle(ADC/200.0);
+  }
  }
   return 0;
 }
 
 ISR(INT0_vect){
-  switch (curState)
-  {
-    case wait_press:
-      curState = debounce_press;
-      break;
-    case debounce_press:
-      curState = wait_release;
-      if(activateTimer == COUNTDOWNFALSE){
-        activateTimer = COUNTDOWNTRUE;
-      }
-      curState = debounce_release;
-      break;
-    case wait_release:
-      break;
-    case debounce_release:
-      curState = wait_press;
-      break;
-    default:
-      curState = wait_press;
-  }
+  if(activateTimer == COUNTDOWNFALSE){
+state state = WAIT_PRESS;
+bool debouncing = true;
+
+while(debouncing){
+if(state == WAIT_PRESS){
+  delayMs(1);
+state = DEBOUNCE_PRESS;
+}
+else if(state == DEBOUNCE_PRESS){
+  delayMs(1);
+  state = WAIT_RELEASE;
+}
+else if(state == WAIT_RELEASE){
+  delayMs(1);
+state = DEBOUNCE_RELEASE;
+  activateTimer = COUNTDOWNTRUE;
+}
+else if(state == DEBOUNCE_RELEASE){
+  delayMs(1);
+debouncing = false;
+}
+}
+}
 }

@@ -11,7 +11,7 @@ void init7Segments(){
     //for clock and enable C7  PIN30
     DDRC |= (1<<DDC7)|(1<<DDC6);
     PORTC &= ~((1<<PORTC7)|(1<<PORTC6));
-
+    turnOff7segments();
 }
 void turnOff7segments(){
     //PORTC &= ~((1<<PORTC6)|(1<<PORTC5)|(1<<PORTC4)|(1<<PORTC3)|(1<<PORTC2)|(1<<PORTC1)|(1<<PORTC0)); 
@@ -20,25 +20,20 @@ void turnOff7segments(){
 
 void shiftData(unsigned short data){
     //lets use PORTC6 pin 31 to send the data and PORTC7 pin 30 to enable
-    Serial.begin(9600);
-    for(unsigned short i = 0x01; i< 0x80; i<<=1){
+    for(unsigned short i = 0x01; i<= 0x80; i<<=1){
         
         //Serial.println(i);
         if((data & i)){ //checks if ones
             PORTC |= (1<<PORTC6); //send a one
-           // Serial.println("True"); 
         }
         else{
             PORTC &= ~(1<<PORTC6); //send a 0
-           // Serial.println("False"); 
         }
         PORTC |= (1<<PORTC7); //turn on enable
         PORTC &= ~(1<<PORTC7); //turn off enable
         
         
     }
-    PORTC |= (1<<PORTC7); //turn on enable
-    PORTC &= ~(1<<PORTC7); //turn off enable
 
     
 }

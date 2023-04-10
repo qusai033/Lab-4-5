@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include "pwm.h"
+#include <Arduino.h>
 
 
 
@@ -40,8 +41,7 @@ void initPWMTimer3(){
 
 
 void changeDutyCycle(float voltage ){ 
-
-    
+    Serial.println(voltage);
      //top = 0x03FF =1023
      //OCR = duty cycle  * TOP
     
