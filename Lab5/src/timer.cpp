@@ -1,56 +1,46 @@
 #include "timer.h"
 
-/* Initialize timer 1, you should not turn the timer on here. Use CTC mode  .*/
+//Timer 0 will be used as debounce in ms
 void initTimer1(){
-TCCR1A &= ~(1 << WGM10);
-TCCR1A &= ~(1 << WGM11);
-TCCR1B|= (1 << WGM12);
-TCCR1B &= ~(1 << WGM13);
 
-}
-void delayS(unsigned int delay){
-    unsigned int delayCnt = 0;
-    OCR1A = 15625; 
+    //set waveform generation bits to CTC mode
+    //WGM13 = 0 WGM12 = 1 WGM11 = 0  WGM10 = 0
 
-    TIFR1 |= (1 << OCF1A); //get clock ready to start
-    TCNT1 = 0;  
-
-    TCCR1B |= ((1 << CS12)|(1 << CS10));
-    TCCR1B &= ~(1 << CS11); //Prescalar of 1024
-
-    while (!(TIFR1 & (1 << OCF1A)));  //While running
-    while (delayCnt < delay) {
-        if (TIFR1 & (1 << OCF1A)) { //count to set delay using a 1 second timer
-            delayCnt++;
-            TIFR1 |= (1 << OCF1A);
-        }
-    }
-    TCCR1B &= ~((1 << CS12)|(1 << CS10)|(1 << CS11)); //turn timer off
-}
-
-/* Initialize timer 0, you should not turn the timer on here.
-* You will need to use CTC mode 
-//Prescalar of 64
-*/
-void initTimer0(){
-TCCR0A &= ~(1 << WGM00);
-TCCR0A |=  (1 << WGM01);
-TCCR0B &= ~(1 << WGM02);
-
-OCR0A = 249; //counter of 249
+    //WGM13 and WGM12 is in TCCR1B
+    TCCR1B &= ~(1<<WGM13);
+    TCCR1B |= (1<<WGM12);
+    //WGM10 and WGM11 are in TCCR0A 
+    TCCR1A &= ~(1<<WGM11); 
+    TCCR1A &= ~(1<<WGM10);
+    
+    
 }
 
 void delayMs(unsigned int delay){
-   unsigned int delayCnt = 0;
-    TCNT0 = 0; //get clock ready
-    TIFR0 |= (1 << OCF0A);
-    TCCR0B |=  ((1 << CS01) | (1 << CS00));
-    TCCR0B &= ~(1 << CS02); //Start clock
-    while (delayCnt < delay) {
-        if (TIFR0 & (1 << OCF0A)) { //count to set delay using a 1 millisecond timer
-            delayCnt++;
-            TIFR0 |= (1 << OCF0A);
-        }
+    int unsigned count = 0; //used for the loop 
+    
+    //ps to 1024
+    // count  = (Td * f)/ps -1= (1ms*16MHz)/1024 -1 = 15.625
+    OCR1A = 16;
+
+    TIFR1 |= (1<<OCF1A); //set the flag down with logic one
+
+    TCNT1 = 0; //clears timer
+    
+    // turning on timer by settin ps to 1024 and start timer
+    //CS02 = 1 CS01 = 0 CS00 = 1
+
+    TCCR1B |= (1<<CS02)|(1<<CS00);
+    
+    TCCR1B &= ~(1<<CS01);
+    
+    
+    while(count < delay) {
+        if((TIFR1 & (1<<OCF1A))){
+            count++;
+            TIFR1 |= (1<<OCF1A); //set timer to start counting again
+        }   
     }
-    TCCR0B &= ~((1 << CS02) | (1 << CS01) | (1 << CS00)); //turn off clock
+    TCCR1B &= ~((1<<CS12)| (1<<CS11)|(1<<CS10)); //turn off clock
+   
 }
