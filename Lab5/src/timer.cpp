@@ -1,7 +1,7 @@
 #include "timer.h"
 
 //Timer 0 will be used as debounce in ms
-void initTimer1(){
+void initTimer0(){
 
     //set waveform generation bits to CTC mode
     //WGM13 = 0 WGM12 = 1 WGM11 = 0  WGM10 = 0
