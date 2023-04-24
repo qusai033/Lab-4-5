@@ -42,3 +42,8 @@ void change_frequency(unsigned int freq_val){
     PORTH |= (1 << PORTH3);
     delayMicroseconds(1000);
 }
+
+void turn_off()
+{
+    PORTH &= (1 << PORTH3);
+}
