@@ -13,7 +13,6 @@ void InitI2C() {
   TWSR &= ~(1 << TWPS1);
 
   // Set two wire interface bit rate register TWBR
-  // TWBR = (F_CPU / (2 * I2C_FREQ)) - 8
   //TWBR = (CPU_clk_fq/SCL_fq - 16)/(2 * 4^TWPS)
   TWBR = 0xC6; //198
 
