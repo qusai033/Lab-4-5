@@ -21,8 +21,43 @@ void write(unsigned char data){
 
 }
 void Read_from(unsigned char SLA, unsigned char MEMADDRESS){
+    // Start a transmission to the SLA
+    TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
 
+    // Wait for completion
+    while (!(TWCR & (1 << TWINT)));
+
+    // Write to the MEMADDRESS
+    TWDR = MEMADDRESS;
+    TWCR = (1 << TWINT) | (1 << TWEN);
+
+    // Wait for completion
+    while (!(TWCR & (1 << TWINT)));
+
+    // Clear TWINT, initiate start condition, initiate enable
+    TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+
+    // Wait for completion
+    //wait_for_completion;
+    while (!(TWCR & (1 << TWINT)));
+
+    // Set two wire data register to the SLA + read bit
+    TWDR = (SLA << 1) | 0x01;
+    TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWEA);
+
+    // Wait for completion
+    while (!(TWCR & (1 << TWINT)));
+
+    // Trigger action
+    TWCR = (1 << TWINT) | (1 << TWEN);
+
+    // Wait for completion
+    while (!(TWCR & (1 << TWINT)));
+
+    // Trigger action + stop condition
+    TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWSTO);
 }
+
 
 unsigned char Read_data(){
   return TWDR; //Returns the last byte
