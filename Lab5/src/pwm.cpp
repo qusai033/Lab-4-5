@@ -2,17 +2,17 @@
 #include "pwm.h"
 #include <Arduino.h>
 
-
+#define arduino_clk_fq 16000000
 
 void initPWMTimer3(){
-    DDRE |= (1<<PORTE3); //set PIN 5 to output  this is for PWM 
-    DDRH |= (1<<PORTH3); //set PIN 6 to output  
+    DDRE |= (1<<PORTE5); //output when using OCR3C for duty cycle mode 15 variable fq port 3
+    //DDRH |= (1<<PORTH3); //set PIN 6 to output  
     //DDRH |= (1<<PORTH4); //set PIN 7 to output = 1A tocontrol motor
 
     //Timer 3
     //set non-inverting mode: output starts high and then is low
-    TCCR3A |= (1<< COM3A1); //set output for OCR to be non-inverting
-    TCCR3A &= ~(1<<COM3A0);
+    TCCR3A |= (1<< COM3C1); //set output for OCR to be non-inverting
+    TCCR3A &= ~(1<<COM3C0);
 
     //set WGM bits for PWM mode 7 fast 10 bit
 
@@ -21,8 +21,7 @@ void initPWMTimer3(){
     //WGM33 and WGM32 are in TCCR3B
     //WGM31 and WGM30 are in TCCR3A
 
-    TCCR3B &= ~(1<<WGM33);
-    TCCR3B |= (1<<WGM32);
+    TCCR3B &= ~(1<<WGM32) | (1<<WGM33);
     TCCR3A |= (1<<WGM31)|(1<<WGM30);
 
     /// PWM frequency calculation for FAST PWM mode on page 148 of datasheet
@@ -31,19 +30,17 @@ void initPWMTimer3(){
     //set ps to 1
     //CS32 = 0  CS31 = 0 CS30=1
     //CS are in TCCR3B
-    TCCR3B &= ~(1<<CS32);
-    TCCR3B &= ~(1<<CS31);
-    TCCR3B |=  (1<<CS30);
+    TCCR3B &= ~(1<<CS02) | (1<<CS01);
+    TCCR3B |=  (1<<CS00);
 }
 
 
 void change_frequency(unsigned int freq_val){
-    OCR3A = 16000000 / freq_val;
-    PORTH |= (1 << PORTH3);
-    delayMicroseconds(1000);
-}
-
-void turn_off()
-{
-    PORTH &= (1 << PORTH3);
+    if(freq_val == 0){
+        OCR3C = 0;
+    }
+    else{
+        OCR3C = ((arduino_clk_fq / freq_val) - 1)  * 0.25; //Sets output compare to a duty cycle of 0.25
+    
+    }
 }
