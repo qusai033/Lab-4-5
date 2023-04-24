@@ -58,6 +58,7 @@ int main()
 
   while (1)
   {
+    /*
     // Read from X high register -> Read from X low register
     Read_from(SLA, SL_MEMA_XAX_HIGH);
     Read_from(SLA, SL_MEMA_XAX_LOW);
@@ -76,6 +77,38 @@ int main()
     Serial.println(x);
     Serial.println(y);
     Serial.println(z);
+    */
+    // Read from X high register -> Read from X low register
+    Read_from(SLA, SL_MEMA_XAX_HIGH);
+    int x = Read_data();
+    Read_from(SLA, SL_MEMA_XAX_LOW);
+    int x = (x << 8) | Read_data();
+    // Read from Y high register -> Read from Y low register
+    Read_from(SLA, SL_MEMA_YAX_HIGH);
+    int y = Read_data();
+    Read_from(SLA, SL_MEMA_YAX_LOW);
+    int y = (y << 8) | Read_data();
+    // Read from Z high register -> Read from Z low register
+    Read_from(SLA, SL_MEMA_ZAX_HIGH);
+    int z = Read_data();
+    Read_from(SLA, SL_MEMA_ZAX_LOW);
+    int z = (z << 8) | Read_data();
+
+    float xAng = map(x, 265, 402, -90, 90);
+    float yAng = map(y, 265, 402, -90, 90);
+    float zAng = map(z, 265, 402, -90, 90);
+    float xRot = RAD_TO_DEG * (atan2(-yAng, -zAng)+PI);
+    float yRot = RAD_TO_DEG * (atan2(-xAng, -zAng)+PI);
+    float zRot = RAD_TO_DEG * (atan2(-yAng, -xAng)+PI);
+
+    // combine and serial print information
+    //float x = SL_MEMA_XAX_HIGH << 8 | SL_MEMA_XAX_LOW;
+    //float y = SL_MEMA_YAX_HIGH << 8 | SL_MEMA_YAX_LOW;
+    //float z = SL_MEMA_ZAX_HIGH << 8 | SL_MEMA_ZAX_LOW;
+    Serial.println(xRot);
+    Serial.println(yRot);
+    Serial.println(zRot);
+    delay(400);
     
     if (true) // change to whatever our threshold is
     {
