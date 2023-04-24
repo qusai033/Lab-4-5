@@ -4,9 +4,22 @@
 
 #define wait_for_completion while(!(TWCR&(1<<TWINT)));
 
-void initI2C(){
+void InitI2C() {
+  // Wake up I2C module on mega 2560
+  PRR0 &= ~(1 << PRTWI);
 
+  // Set prescaler TWPS to 1
+  TWSR &= ~(1 << TWPS0);
+  TWSR &= ~(1 << TWPS1);
+
+  // Set two wire interface bit rate register TWBR
+  // TWBR = (F_CPU / (2 * I2C_FREQ)) - 8
+  TWBR = ((F_CPU / (2 * I2C_FREQ)) - 8);
+
+  // Enable two wire interface
+  TWCR |= (1 << TWEN);
 }
+
 
 void StartI2C_Trans(unsigned char SLA) {
   // Clear TWINT, initiate start condition, initiate enable
