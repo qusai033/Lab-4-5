@@ -47,15 +47,30 @@ int main()
   initSPIMaster();
   initSwitchPB7();
   initTimer1();
+  
+  //signed int T_val = 0;         //Temperature read from chip
+  //float      T_C   = 0;         //Temperature in Celcius
+  signed int X_val = 0;
+  signed int Y_val = 0;
+  signed int Z_val = 0;
+
+  signed int Y_val_init = 0;
+  signed int Z_val_init = 0;
+
+  signed int threshhold_val_y_min = 0;    
+  signed int threshhold_val_y_max = 0;    
+  signed int threshhold_val_z_min = 0;  
+  signed int threshhold_val_z_max = 0; 
 
   Serial.begin(9600);
-
   sei(); // activate global interrupts
 
   StartI2C_Trans(SLA);
   write(PWR_MGMT); // write to power management
   write(WAKEUP); // write the wakeup command
-
+  StopI2C_Trans();
+  
+  
     //reading inital values
     delayMs(1);
     Read_from(SLA,SL_MEMA_YAX_HIGH);
