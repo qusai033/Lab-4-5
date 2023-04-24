@@ -69,6 +69,13 @@ int main()
     Read_from(SLA, SL_MEMA_ZAX_LOW);
 
     // combine and serial print information
+    // combine and serial print information
+    int x = SL_MEMA_XAX_HIGH << 8 | SL_MEMA_XAX_LOW;
+    int y = SL_MEMA_YAX_HIGH << 8 | SL_MEMA_YAX_LOW;
+    int z = SL_MEMA_ZAX_HIGH << 8 | SL_MEMA_ZAX_LOW;
+    Serial.println(x);
+    Serial.println(y);
+    Serial.println(z);
     
     if (true) // change to whatever our threshold is
     {
@@ -80,6 +87,7 @@ int main()
       else
       {
         turn_off();
+        alarmStatus = ALARMOFF;
       }
     }
 
