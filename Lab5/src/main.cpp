@@ -77,6 +77,10 @@ int main()
         //change_frequency(400);
         alarmStatus = ALARMON;
       }
+      else
+      {
+        turn_off();
+      }
     }
 
     StopI2C_Trans();
