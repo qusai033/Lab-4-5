@@ -17,9 +17,19 @@ void StopI2C_Trans(){
   TWCR = (1<<TWINT)|(1<<TWEN)|(1<<TWSTO);
 }
 
-void write(unsigned char data){
 
+void Write(unsigned char data) {
+  // Set two wire data register equal to incoming data
+  TWDR = data;
+
+  // Trigger action
+  TWCR = (1 << TWINT) | (1 << TWEN);
+
+  // Wait for completion
+  //wait_for_completion;
+  while (!(TWCR & (1 << TWINT)));
 }
+
 void Read_from(unsigned char SLA, unsigned char MEMADDRESS){
     // Start a transmission to the SLA
     TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
