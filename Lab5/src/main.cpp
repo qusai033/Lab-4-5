@@ -56,59 +56,77 @@ int main()
   write(PWR_MGMT); // write to power management
   write(WAKEUP); // write the wakeup command
 
+    //reading inital values
+    delayMs(1);
+    Read_from(SLA,SL_MEMA_YAX_HIGH);
+    Y_val_init = Read_data();              //read upper value
+    Read_from(SLA,SL_MEMA_YAX_LOW);
+    Y_val_init = (Y_val_init<<8)|Read_data();    //read lower value
+    
+    Read_from(SLA,SL_MEMA_ZAX_HIGH);
+    Z_val_init = Read_data();              //read upper value
+    Read_from(SLA,SL_MEMA_ZAX_LOW);
+    Z_val_init = (Z_val_init<<8)|Read_data();    //read lower value    
+    
+    StopI2C_Trans();
+  
+  threshhold_val_y_max = Y_val_init+6000;
+  threshhold_val_y_min = Y_val_init-6000;
+  threshhold_val_z_max = Z_val_init+6000;
+  threshhold_val_y_min = Y_val_init-6000;
+  
   while (1)
   {
-    /*
-    // Read from X high register -> Read from X low register
-    Read_from(SLA, SL_MEMA_XAX_HIGH);
-    Read_from(SLA, SL_MEMA_XAX_LOW);
-    // Read from Y high register -> Read from Y low register
-    Read_from(SLA, SL_MEMA_YAX_HIGH);
-    Read_from(SLA, SL_MEMA_YAX_LOW);
-    // Read from Z high register -> Read from Z low register
-    Read_from(SLA, SL_MEMA_ZAX_HIGH);
-    Read_from(SLA, SL_MEMA_ZAX_LOW);
+    delayMS(1000);
+    //Reading x data
+    
+    Read_from(SLA,SL_MEMA_XAX_HIGH);
 
-    // combine and serial print information
-    // combine and serial print information
-    int x = SL_MEMA_XAX_HIGH << 8 | SL_MEMA_XAX_LOW;
-    int y = SL_MEMA_YAX_HIGH << 8 | SL_MEMA_YAX_LOW;
-    int z = SL_MEMA_ZAX_HIGH << 8 | SL_MEMA_ZAX_LOW;
-    Serial.println(x);
-    Serial.println(y);
-    Serial.println(z);
-    */
-    // Read from X high register -> Read from X low register
-    Read_from(SLA, SL_MEMA_XAX_HIGH);
-    int x = Read_data();
-    Read_from(SLA, SL_MEMA_XAX_LOW);
-    int x = (x << 8) | Read_data();
-    // Read from Y high register -> Read from Y low register
-    Read_from(SLA, SL_MEMA_YAX_HIGH);
-    int y = Read_data();
-    Read_from(SLA, SL_MEMA_YAX_LOW);
-    int y = (y << 8) | Read_data();
-    // Read from Z high register -> Read from Z low register
-    Read_from(SLA, SL_MEMA_ZAX_HIGH);
-    int z = Read_data();
-    Read_from(SLA, SL_MEMA_ZAX_LOW);
-    int z = (z << 8) | Read_data();
+    X_val = Read_data();              //read upper value
 
-    float xAng = map(x, 265, 402, -90, 90);
-    float yAng = map(y, 265, 402, -90, 90);
-    float zAng = map(z, 265, 402, -90, 90);
-    float xRot = RAD_TO_DEG * (atan2(-yAng, -zAng)+PI);
-    float yRot = RAD_TO_DEG * (atan2(-xAng, -zAng)+PI);
-    float zRot = RAD_TO_DEG * (atan2(-yAng, -xAng)+PI);
+    Read_from(SLA,SL_MEMA_XAX_LOW);
+    X_val = (X_val<<8)|Read_data();    //read lower value
 
-    // combine and serial print information
-    //float x = SL_MEMA_XAX_HIGH << 8 | SL_MEMA_XAX_LOW;
-    //float y = SL_MEMA_YAX_HIGH << 8 | SL_MEMA_YAX_LOW;
-    //float z = SL_MEMA_ZAX_HIGH << 8 | SL_MEMA_ZAX_LOW;
-    Serial.println(xRot);
-    Serial.println(yRot);
-    Serial.println(zRot);
-    delay(400);
+    Serial.print("X = ");
+    Serial.println(X_val);
+
+    //Reading y data
+    
+    Read_from(SLA,SL_MEMA_YAX_HIGH);
+
+    Y_val = Read_data();              //read upper value
+
+    Read_from(SLA,SL_MEMA_YAX_LOW);
+    Y_val = (Y_val<<8)|Read_data();    //read lower value
+    Serial.print("Yinit = ");
+    Serial.println(Y_val_init);
+    Serial.print("Y threshold max = ");
+    Serial.println(threshhold_val_y_max);
+    Serial.print("Y threshold min = ");
+    Serial.println(threshhold_val_y_min);
+    Serial.print("Y = ");
+    Serial.println(Y_val);
+
+    //Reading z data
+    
+    Read_from(SLA,SL_MEMA_ZAX_HIGH);
+
+    Z_val = Read_data();              //read upper value
+
+    Read_from(SLA,SL_MEMA_ZAX_LOW);
+    Z_val = (Z_val<<8)|Read_data();    //read lower value
+
+    Serial.print("Zinit = ");
+    Serial.println(Z_val_init);
+    
+    Serial.print("Z max threshold = ");
+    Serial.println(threshhold_val_z_max);
+    Serial.print("Z min threshold = ");
+    Serial.println(threshhold_val_z_min);
+    Serial.print("Z = ");
+    Serial.println(Z_val);
+    
+    StopI2C_Trans();
     
     if (true) // change to whatever our threshold is
     {
