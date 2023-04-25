@@ -71,6 +71,12 @@ int main()
   write(WAKEUP); // write the wakeup command
   StopI2C_Trans();
   
+  // display setup
+  write_execute(0x0A,0x08); //Brightness control
+  write_execute(0x0B,0x07); //scan all rows and collumns
+  write_execute(0x0C,0x01); //set shutdown register to normal operation
+  write_execute(0x0F,0x00); //display test register set to normal operation
+  
   
     //reading inital values
     delayMs(1);
