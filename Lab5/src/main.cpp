@@ -159,7 +159,7 @@ int main()
       }
       else
       {
-        turn_off();
+        change_frequency(0);
         alarmStatus = ALARMOFF;
       }
       
