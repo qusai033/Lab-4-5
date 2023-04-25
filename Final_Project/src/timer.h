@@ -5,7 +5,7 @@
 
 #include <avr/io.h>
 
-void initTimer1();
+void initTimer0();
 void delayMs(unsigned int delay); 
 
 #endif
