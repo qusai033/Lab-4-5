@@ -39,6 +39,7 @@ typedef enum alarmSound {
 } alarmSound;
 
 alarmSound alarmStatus = ALARMOFF;
+alarmSound ledStatus = ALARMOFF;
 
 int main()
 {
@@ -90,6 +91,8 @@ int main()
   threshhold_val_z_max = Z_val_init+6000;
   threshhold_val_y_min = Y_val_init-6000;
   
+  int freq = 500;
+  
   while (1)
   {
     delayMS(1000);
@@ -101,7 +104,7 @@ int main()
 
     Read_from(SLA,SL_MEMA_XAX_LOW);
     X_val = (X_val<<8)|Read_data();    //read lower value
-
+    StopI2C_Trans();
     Serial.print("X = ");
     Serial.println(X_val);
 
@@ -113,6 +116,7 @@ int main()
 
     Read_from(SLA,SL_MEMA_YAX_LOW);
     Y_val = (Y_val<<8)|Read_data();    //read lower value
+    
     Serial.print("Yinit = ");
     Serial.println(Y_val_init);
     Serial.print("Y threshold max = ");
@@ -121,6 +125,7 @@ int main()
     Serial.println(threshhold_val_y_min);
     Serial.print("Y = ");
     Serial.println(Y_val);
+    StopI2C_Trans();
 
     //Reading z data
     
@@ -140,14 +145,16 @@ int main()
     Serial.println(threshhold_val_z_min);
     Serial.print("Z = ");
     Serial.println(Z_val);
+   
     
-    StopI2C_Trans();
-    
-    if (true) // change to whatever our threshold is
+    if (Y_val > threshhold_val_y_max || Y_val < threshhold_val_y_min || Z_val > threshhold_val_z_max || Z_val < threshhold_val_z_min)
     {
       if (alarmStatus == ALARMOFF)
       {
-        //change_frequency(400);
+        change_frequency(freq);
+        freq += 500;
+        if (freq > 10000)
+          freq = 500;
         alarmStatus = ALARMON;
       }
       else
@@ -155,9 +162,32 @@ int main()
         turn_off();
         alarmStatus = ALARMOFF;
       }
+      
+      ledStatus = ALARMON;
+      // make the led into frown
+      SPI_write_execute(0x01,0b00000000);
+      SPI_write_execute(0x02,0b00000000);
+      SPI_write_execute(0x03,0b00100100);
+      SPI_write_execute(0x04,0b00000000);
+      SPI_write_execute(0x05,0b00011000);
+      SPI_write_execute(0x06,0b01100110);
+      SPI_write_execute(0x07,0b10000001);
+      SPI_write_execute(0x08,0b00000000);
+    }
+    else
+    {
+      // make the led into smile
+      SPI_write_execute(0x01,0b00000000);
+      SPI_write_execute(0x02,0b00000000);
+      SPI_write_execute(0x03,0b00100100);
+      SPI_write_execute(0x04,0b00000000);
+      SPI_write_execute(0x05,0b10000001);
+      SPI_write_execute(0x06,0b01100110);
+      SPI_write_execute(0x07,0b00111100);
+      SPI_write_execute(0x08,0b00000000);
     }
 
-    StopI2C_Trans();
+    //StopI2C_Trans();
   }
 
   return 0;
