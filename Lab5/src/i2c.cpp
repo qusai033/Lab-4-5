@@ -4,7 +4,7 @@
 
 #define wait_for_completion while(!(TWCR&(1<<TWINT)));
 
-void InitI2C() {
+void initI2C() {
   // Wake up I2C module on mega 2560
   PRR0 &= ~(1 << PRTWI);
 
@@ -17,7 +17,7 @@ void InitI2C() {
   TWBR = 0xC6; //198
 
   // Enable two wire interface
-  TWCR |= (1 << TWEN);
+  TWCR |= (1 << TWINT)|(1 << TWEN);
 }
 
 
@@ -29,7 +29,7 @@ void StartI2C_Trans(unsigned char SLA) {
   while (!(TWCR & (1 << TWINT)));
 
   // Set two wire data register to the SLA + write bit
-  TWDR = (SLA << 1) | 0x00;
+  TWDR = (SLA << 1);
 
   // Trigger action: Clear TWINT and initiate enable
   TWCR = (1 << TWINT) | (1 << TWEN);
@@ -45,7 +45,7 @@ void StopI2C_Trans(){
 }
 
 
-void Write(unsigned char data) {
+void write(unsigned char data) {
   // Set two wire data register equal to incoming data
   TWDR = data;
 
@@ -59,17 +59,10 @@ void Write(unsigned char data) {
 
 void Read_from(unsigned char SLA, unsigned char MEMADDRESS){
     // Start a transmission to the SLA
-    TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
+    StartI2C_Trans(SLA);
 
     // Wait for completion
-    while (!(TWCR & (1 << TWINT)));
-
-    // Write to the MEMADDRESS
-    TWDR = MEMADDRESS;
-    TWCR = (1 << TWINT) | (1 << TWEN);
-
-    // Wait for completion
-    while (!(TWCR & (1 << TWINT)));
+    write(MEMADDRESS);
 
     // Clear TWINT, initiate start condition, initiate enable
     TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
