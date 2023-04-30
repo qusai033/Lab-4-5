@@ -55,13 +55,12 @@ int main()
   signed int Y_val = 0;
   signed int Z_val = 0;
 
+  signed int X_val_init = 0;
   signed int Y_val_init = 0;
   signed int Z_val_init = 0;
 
-  signed int threshhold_val_y_min = 0;    
-  signed int threshhold_val_y_max = 0;    
-  signed int threshhold_val_z_min = 0;  
-  signed int threshhold_val_z_max = 0; 
+  signed int threshhold = 6000;   
+
 
   Serial.begin(9600);
   sei(); // activate global interrupts
@@ -72,14 +71,21 @@ int main()
   StopI2C_Trans();
   
   // display setup
-  write_execute(0x0A,0x08); //Brightness control
-  write_execute(0x0B,0x07); //scan all rows and collumns
-  write_execute(0x0C,0x01); //set shutdown register to normal operation
-  write_execute(0x0F,0x00); //display test register set to normal operation
+  SPI_write_execute(0x0A,0x08); //Brightness control
+  SPI_write_execute(0x0B,0x07); //scan all rows and collumns
+  SPI_write_execute(0x0C,0x01); //set shutdown register to normal operation
+  SPI_write_execute(0x0F,0x00); //display test register set to normal operation
   
   
     //reading inital values
     delayMs(1);
+    Read_from(SLA,SL_MEMA_XAX_HIGH);
+
+    X_val_init = Read_data();              //read upper value
+
+    Read_from(SLA,SL_MEMA_XAX_LOW);
+    X_val_init = (X_val_init<<8)|Read_data();
+
     Read_from(SLA,SL_MEMA_YAX_HIGH);
     Y_val_init = Read_data();              //read upper value
     Read_from(SLA,SL_MEMA_YAX_LOW);
@@ -92,25 +98,21 @@ int main()
     
     StopI2C_Trans();
   
-  threshhold_val_y_max = Y_val_init+6000;
-  threshhold_val_y_min = Y_val_init-6000;
-  threshhold_val_z_max = Z_val_init+6000;
-  threshhold_val_y_min = Y_val_init-6000;
   
-  int freq = 500;
+  
+  int freq = 5000;
   
   while (1)
   {
-    delayMS(1000);
     //Reading x data
-    
+    delayMs(100);
     Read_from(SLA,SL_MEMA_XAX_HIGH);
 
     X_val = Read_data();              //read upper value
 
     Read_from(SLA,SL_MEMA_XAX_LOW);
     X_val = (X_val<<8)|Read_data();    //read lower value
-    StopI2C_Trans();
+    //StopI2C_Trans();
     Serial.print("X = ");
     Serial.println(X_val);
 
@@ -123,15 +125,16 @@ int main()
     Read_from(SLA,SL_MEMA_YAX_LOW);
     Y_val = (Y_val<<8)|Read_data();    //read lower value
     
-    Serial.print("Yinit = ");
-    Serial.println(Y_val_init);
-    Serial.print("Y threshold max = ");
-    Serial.println(threshhold_val_y_max);
-    Serial.print("Y threshold min = ");
-    Serial.println(threshhold_val_y_min);
+    //Serial.print("Yinit = ");
+    //Serial.println(Y_val_init);
+    //Serial.print("Y threshold max = ");
+    //Serial.println(threshhold_val_y_max);
+    //Serial.print("Y threshold min = ");
+    //Serial.println(threshhold_val_y_min);
     Serial.print("Y = ");
     Serial.println(Y_val);
-    StopI2C_Trans();
+    
+    //StopI2C_Trans();
 
     //Reading z data
     
@@ -141,36 +144,35 @@ int main()
 
     Read_from(SLA,SL_MEMA_ZAX_LOW);
     Z_val = (Z_val<<8)|Read_data();    //read lower value
-
-    Serial.print("Zinit = ");
-    Serial.println(Z_val_init);
     
-    Serial.print("Z max threshold = ");
-    Serial.println(threshhold_val_z_max);
-    Serial.print("Z min threshold = ");
-    Serial.println(threshhold_val_z_min);
+
+    //Serial.print("Zinit = ");
+    //Serial.println(Z_val_init);
+    
+    //Serial.print("Z max threshold = ");
+    //Serial.println(threshhold_val_z_max);
+    //Serial.print("Z min threshold = ");
+    //Serial.println(threshhold_val_z_min);
     Serial.print("Z = ");
     Serial.println(Z_val);
-   
+    Serial.println("-----");
+    StopI2C_Trans();
+    if ((abs(X_val - abs(X_val_init)) > threshhold) || (abs(Y_val - abs(Y_val_init)) > threshhold) || (abs(Z_val - abs(Z_val_init)) > threshhold)){
+      alarmStatus = ALARMON;
+    }
     
-    if (Y_val > threshhold_val_y_max || Y_val < threshhold_val_y_min || Z_val > threshhold_val_z_max || Z_val < threshhold_val_z_min)
-    {
-      if (alarmStatus == ALARMOFF)
+
+
+      if (alarmStatus == ALARMON)
       {
-        change_frequency(freq);
-        freq += 500;
-        if (freq > 10000)
-          freq = 500;
-        alarmStatus = ALARMON;
+      change_frequency(freq);
+      if(freq == 5000){
+        freq = 1000;
       }
-      else
-      {
-        change_frequency(0);
-        alarmStatus = ALARMOFF;
+      else{
+        freq = 5000;
       }
-      
-      ledStatus = ALARMON;
-      // make the led into frown
+      //Serial.println("on");
       SPI_write_execute(0x01,0b00000000);
       SPI_write_execute(0x02,0b00000000);
       SPI_write_execute(0x03,0b00100100);
@@ -179,10 +181,11 @@ int main()
       SPI_write_execute(0x06,0b01100110);
       SPI_write_execute(0x07,0b10000001);
       SPI_write_execute(0x08,0b00000000);
-    }
-    else
-    {
-      // make the led into smile
+      }
+      else
+      {
+        change_frequency(0);
+       // Serial.println("off");
       SPI_write_execute(0x01,0b00000000);
       SPI_write_execute(0x02,0b00000000);
       SPI_write_execute(0x03,0b00100100);
@@ -191,40 +194,36 @@ int main()
       SPI_write_execute(0x06,0b01100110);
       SPI_write_execute(0x07,0b00111100);
       SPI_write_execute(0x08,0b00000000);
+      }
+      
     }
-
-    //StopI2C_Trans();
-  }
 
   return 0;
 }
 
 ISR(INT0_vect){
-  // only silence if the alarm is on
   if(alarmStatus == ALARMON){
-    state state = WAIT_PRESS;
-    bool debouncing = true;
-    // while we are going through switch press
-    while(debouncing){
-      if(state == WAIT_PRESS){
-        delayMs(1);
-        state = DEBOUNCE_PRESS;
-      }
-      else if(state == DEBOUNCE_PRESS){
-        delayMs(1);
-        state = WAIT_RELEASE;
-      }
-      // on release set the alarmStatus to off
-      else if(state == WAIT_RELEASE){
-        delayMs(1);
-        state = DEBOUNCE_RELEASE;
-        alarmStatus = ALARMOFF;
-      }
-      // on release we are no longer pressing switch
-      else if(state == DEBOUNCE_RELEASE){
-        delayMs(1);
-        debouncing = false;
-      }
-    }
-  }
+state state = WAIT_PRESS;
+bool debouncing = true;
+
+while(debouncing){
+if(state == WAIT_PRESS){
+  delayMs(1);
+state = DEBOUNCE_PRESS;
+}
+else if(state == DEBOUNCE_PRESS){
+  delayMs(1);
+  state = WAIT_RELEASE;
+}
+else if(state == WAIT_RELEASE){
+  delayMs(1);
+state = DEBOUNCE_RELEASE;
+  alarmStatus = ALARMOFF;
+}
+else if(state == DEBOUNCE_RELEASE){
+  delayMs(1);
+debouncing = false;
+}
+}
+}
 }
