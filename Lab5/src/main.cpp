@@ -49,8 +49,6 @@ int main()
   initSwitchPB7();
   initTimer1();
   
-  //signed int T_val = 0;         //Temperature read from chip
-  //float      T_C   = 0;         //Temperature in Celcius
   signed int X_val = 0;
   signed int Y_val = 0;
   signed int Z_val = 0;
