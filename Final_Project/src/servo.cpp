@@ -1,22 +1,39 @@
+// Include the necessary libraries
 #include <Servo.h>
 
-// create an instance of the Servo class
+// Define the servo motor pin and LED pin
+const int servoPin = 9;
+const int LEDPin = 13;
+
+// Create an instance of the Servo library
 Servo servo;
 
-// define the pin connected to the servo motor
-#define SERVO_PIN 11
+// Declare variables
+int servoPosition = 0; // Initial position for the servo
 
-void servo_setup() {
-  // initialize the servo motor
-  servo.attach(SERVO_PIN);
+void setup() {
+  // Attach the servo motor to the specified pin
+  servo.attach(servoPin);
+
+  // Set the LED pin as OUTPUT
+  pinMode(LEDPin, OUTPUT);
+
+  // Initialize the serial communication
+  Serial.begin(9600);
 }
 
-void servo_unlock() {
-  // unlock the door by rotating the servo motor to 90 degrees
-  servo.write(90);
-}
+void loop() {
+  // Sweep the servo from 0 to 180 degrees
+  for (servoPosition = 0; servoPosition <= 180; servoPosition++) {
+    servo.write(servoPosition);
+    digitalWrite(LEDPin, HIGH); // Turn the LED on
+    delay(15); // Adjust the delay to control the servo sweep speed
+  }
 
-void servo_lock() {
-  // lock the door by rotating the servo motor back to 0 degrees
-  servo.write(0);
+  // Sweep the servo from 180 to 0 degrees
+  for (servoPosition = 180; servoPosition >= 0; servoPosition--) {
+    servo.write(servoPosition);
+    digitalWrite(LEDPin, LOW); // Turn the LED off
+    delay(15); // Adjust the delay to control the servo sweep speed
+  }
 }
