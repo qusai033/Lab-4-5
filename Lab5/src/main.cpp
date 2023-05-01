@@ -48,15 +48,15 @@ int main()
   initSPIMaster();
   initSwitchPB7();
   initTimer1();
-  
+  //values for taking the current position of the gyroscope
   signed int X_val = 0;
   signed int Y_val = 0;
   signed int Z_val = 0;
-
+  //values for the default state of the gyroscope
   signed int X_val_init = 0;
   signed int Y_val_init = 0;
   signed int Z_val_init = 0;
-
+  //threshold for the 
   signed int threshhold = 6000;   
 
 
@@ -111,6 +111,8 @@ int main()
     Read_from(SLA,SL_MEMA_XAX_LOW);
     X_val = (X_val<<8)|Read_data();    //read lower value
     //StopI2C_Trans();
+    Serial.print("Xinit = ");
+    Serial.println(X_val_init);
     Serial.print("X = ");
     Serial.println(X_val);
 
@@ -123,8 +125,8 @@ int main()
     Read_from(SLA,SL_MEMA_YAX_LOW);
     Y_val = (Y_val<<8)|Read_data();    //read lower value
     
-    //Serial.print("Yinit = ");
-    //Serial.println(Y_val_init);
+    Serial.print("Yinit = ");
+    Serial.println(Y_val_init);
     //Serial.print("Y threshold max = ");
     //Serial.println(threshhold_val_y_max);
     //Serial.print("Y threshold min = ");
@@ -144,8 +146,8 @@ int main()
     Z_val = (Z_val<<8)|Read_data();    //read lower value
     
 
-    //Serial.print("Zinit = ");
-    //Serial.println(Z_val_init);
+    Serial.print("Zinit = ");
+    Serial.println(Z_val_init);
     
     //Serial.print("Z max threshold = ");
     //Serial.println(threshhold_val_z_max);
@@ -157,6 +159,24 @@ int main()
     StopI2C_Trans();
     if ((abs(X_val - abs(X_val_init)) > threshhold) || (abs(Y_val - abs(Y_val_init)) > threshhold) || (abs(Z_val - abs(Z_val_init)) > threshhold)){
       alarmStatus = ALARMON;
+      SPI_write_execute(0x01,0b00000000);
+      SPI_write_execute(0x02,0b00000000);
+      SPI_write_execute(0x03,0b00100100);
+      SPI_write_execute(0x04,0b00000000);
+      SPI_write_execute(0x05,0b00011000);
+      SPI_write_execute(0x06,0b01100110);
+      SPI_write_execute(0x07,0b10000001);
+      SPI_write_execute(0x08,0b00000000);
+    }
+    else{
+      SPI_write_execute(0x01,0b00000000);
+      SPI_write_execute(0x02,0b00000000);
+      SPI_write_execute(0x03,0b00100100);
+      SPI_write_execute(0x04,0b00000000);
+      SPI_write_execute(0x05,0b10000001);
+      SPI_write_execute(0x06,0b01100110);
+      SPI_write_execute(0x07,0b00111100);
+      SPI_write_execute(0x08,0b00000000);
     }
     
 
@@ -171,27 +191,12 @@ int main()
         freq = 5000;
       }
       //Serial.println("on");
-      SPI_write_execute(0x01,0b00000000);
-      SPI_write_execute(0x02,0b00000000);
-      SPI_write_execute(0x03,0b00100100);
-      SPI_write_execute(0x04,0b00000000);
-      SPI_write_execute(0x05,0b00011000);
-      SPI_write_execute(0x06,0b01100110);
-      SPI_write_execute(0x07,0b10000001);
-      SPI_write_execute(0x08,0b00000000);
       }
       else
       {
         change_frequency(0);
        // Serial.println("off");
-      SPI_write_execute(0x01,0b00000000);
-      SPI_write_execute(0x02,0b00000000);
-      SPI_write_execute(0x03,0b00100100);
-      SPI_write_execute(0x04,0b00000000);
-      SPI_write_execute(0x05,0b10000001);
-      SPI_write_execute(0x06,0b01100110);
-      SPI_write_execute(0x07,0b00111100);
-      SPI_write_execute(0x08,0b00000000);
+      
       }
       
     }
