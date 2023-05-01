@@ -1,17 +1,17 @@
-// define buzzer pin
-const int buzzerPin = 3;
+// define the pin connected to the buzzer
+#define BUZZER_PIN 8
 
-void setup() {
-  // initialize buzzer pin as output
-  pinMode(buzzerPin, OUTPUT);
+void buzzer_setup() {
+  // initialize the buzzer pin as an output
+  pinMode(BUZZER_PIN, OUTPUT);
 }
 
-void loop() {
-  // turn on buzzer for 1 second
-  digitalWrite(buzzerPin, HIGH);
-  delay(1000);
+void buzzer_on() {
+  // turn on the buzzer
+  digitalWrite(BUZZER_PIN, HIGH);
+}
 
-  // turn off buzzer for 1 second
-  digitalWrite(buzzerPin, LOW);
-  delay(1000);
+void buzzer_off() {
+  // turn off the buzzer
+  digitalWrite(BUZZER_PIN, LOW);
 }
