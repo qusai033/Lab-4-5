@@ -158,7 +158,16 @@ int main()
     Serial.println("-----");
     StopI2C_Trans();
     if ((abs(X_val - abs(X_val_init)) > threshhold) || (abs(Y_val - abs(Y_val_init)) > threshhold) || (abs(Z_val - abs(Z_val_init)) > threshhold)){
+      ledStatus = ALARMON;
       alarmStatus = ALARMON;
+    }
+    else{
+      ledStatus = ALARMOFF;
+    }
+    
+
+    if (ledStatus == ALARMON)
+    {
       SPI_write_execute(0x01,0b00000000);
       SPI_write_execute(0x02,0b00000000);
       SPI_write_execute(0x03,0b00100100);
@@ -168,8 +177,9 @@ int main()
       SPI_write_execute(0x07,0b10000001);
       SPI_write_execute(0x08,0b00000000);
     }
-    else{
-      SPI_write_execute(0x01,0b00000000);
+    else
+    {
+       SPI_write_execute(0x01,0b00000000);
       SPI_write_execute(0x02,0b00000000);
       SPI_write_execute(0x03,0b00100100);
       SPI_write_execute(0x04,0b00000000);
@@ -178,8 +188,6 @@ int main()
       SPI_write_execute(0x07,0b00111100);
       SPI_write_execute(0x08,0b00000000);
     }
-    
-
 
       if (alarmStatus == ALARMON)
       {
