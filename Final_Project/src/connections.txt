@@ -1,0 +1,61 @@
+*IMPORTANT*
+
+When a valid RFID tag is scanned, the door unlocks using the servo motor, the green LED turns on, and the PIR motion sensor and buzzer become active. 
+If motion is detected while the door is unlocked, the buzzer will be activated. 
+After a specified duration, the door will lock again, the green LED will turn off, and the PIR motion sensor and buzzer will become inactive.
+
+
+
+Connections:
+
+PIR motion sensor: Connect the sensor's VCC, GND, and OUT pins to the Arduino's 5V, GND, and digital pin 2, respectively.
+
+RC522 RFID module: Follow the connections mentioned in the RFID module integration example.
+
+Servo motor: Connect the servo's signal, VCC, and GND pins to the Arduino's digital pin 9, 5V, and GND, respectively.
+
+General indication LED: Connect the LED's anode to the Arduino's digital pin 13 and the cathode to GND through a 220-ohm resistor.
+
+Green LED for successful door unlock: Connect the LED's anode to the Arduino's digital pin 4 and the cathode to GND through a 220-ohm resistor.
+
+Buzzer: Connect the buzzer's positive and negative pins to the Arduino's digital pin 3 and GND, respectively.
+
+
+Step 1: Connect the RC522 RFID module to the Arduino board
+
+Connect the SDA pin of the RC522 to the digital pin 10 on the Arduino board.
+Connect the SCK pin of the RC522 to the digital pin 13 on the Arduino board.
+Connect the MOSI pin of the RC522 to the digital pin 11 on the Arduino board.
+Connect the MISO pin of the RC522 to the digital pin 12 on the Arduino board.
+Connect the GND pin of the RC522 to a GND pin on the Arduino board.
+Connect the RST pin of the RC522 to the digital pin 9 on the Arduino board.
+Connect the 3.3V pin of the RC522 to the 3.3V pin on the Arduino board.
+Step 2: Install the MFRC522 library for Arduino
+
+Open the Arduino IDE and go to Sketch > Include Library > Manage Libraries.
+Search for "MFRC522" and install the library by Miguel Balboa.
+
+
+
+Connect the PIR motion sensor to the Arduino board
+
+Connect the VCC pin of the PIR sensor to the 5V pin on the Arduino board.
+Connect the GND pin of the PIR sensor to the GND pin on the Arduino board.
+Connect the OUT pin of the PIR sensor to the digital pin 2 on the Arduino board.
+
+
+
+Connect the servo motor and LED to the Arduino board
+
+Connect the servo motor signal pin (usually orange or yellow) to the digital pin 9 on the Arduino board.
+Connect the servo motor VCC pin (usually red) to the 5V pin on the Arduino board.
+Connect the servo motor GND pin (usually brown or black) to the GND pin on the Arduino board.
+Connect the anode (long leg) of the LED to the digital pin 13 on the Arduino board.
+Connect the cathode (short leg) of the LED to the GND pin on the Arduino board through a 220-ohm resistor.
+
+
+
+Connect the buzzer to the Arduino board
+
+Connect the positive pin of the buzzer to the digital pin 3 on the Arduino board.
+Connect the negative pin of the buzzer to the GND pin on the Arduino board.
