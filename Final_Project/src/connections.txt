@@ -23,12 +23,12 @@ Buzzer: Connect the buzzer's positive and negative pins to the Arduino's digital
 
 Step 1: Connect the RC522 RFID module to the Arduino board
 
-Connect the SDA pin of the RC522 to the digital pin 10 on the Arduino board.
-Connect the SCK pin of the RC522 to the digital pin 13 on the Arduino board.
-Connect the MOSI pin of the RC522 to the digital pin 11 on the Arduino board.
-Connect the MISO pin of the RC522 to the digital pin 12 on the Arduino board.
+Connect the SDA pin of the RC522 to the digital pin 53 on the Arduino board.
+Connect the SCK pin of the RC522 to the digital pin 52 on the Arduino board.
+Connect the MOSI pin of the RC522 to the digital pin 51 on the Arduino board.
+Connect the MISO pin of the RC522 to the digital pin 50 on the Arduino board.
 Connect the GND pin of the RC522 to a GND pin on the Arduino board.
-Connect the RST pin of the RC522 to the digital pin 9 on the Arduino board.
+Connect the RST pin of the RC522 to the digital pin 5 on the Arduino board.
 Connect the 3.3V pin of the RC522 to the 3.3V pin on the Arduino board.
 Step 2: Install the MFRC522 library for Arduino
 
@@ -47,7 +47,7 @@ Connect the OUT pin of the PIR sensor to the digital pin 2 on the Arduino board.
 
 Connect the servo motor and LED to the Arduino board
 
-Connect the servo motor signal pin (usually orange or yellow) to the digital pin 9 on the Arduino board.
+Connect the servo motor signal pin (usually orange or yellow) to the digital pin 6 on the Arduino board.
 Connect the servo motor VCC pin (usually red) to the 5V pin on the Arduino board.
 Connect the servo motor GND pin (usually brown or black) to the GND pin on the Arduino board.
 Connect the anode (long leg) of the LED to the digital pin 13 on the Arduino board.
