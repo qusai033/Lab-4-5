@@ -27,20 +27,18 @@ void initPWMTimer3(){
     /// PWM frequency calculation for FAST PWM mode on page 148 of datasheet
     //TOP = 1023
 
-    //set ps to 1
-    //CS32 = 0  CS31 = 0 CS30=1
-    //CS are in TCCR3B
-    TCCR3B &= ~(1<<CS02) | (1<<CS01);
-    TCCR3B |=  (1<<CS00);
+    //prescalar of 256
+    TCCR3B &= ~(1<<CS00) | (1<<CS01);
+    TCCR3B |=  (1<<CS02);
 }
 
 
-void change_frequency(unsigned int freq_val){
-    if(freq_val == 0){
-        OCR3C = 0;
+void setLocked(bool locked){
+    if(locked){
+        OCR3C = 35;
     }
     else{
-        OCR3C = ((arduino_clk_fq / freq_val) - 1)  * 0.25; //Sets output compare to a duty cycle of 0.25
+        OCR3C = 70;
     
     }
 }
