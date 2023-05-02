@@ -13,7 +13,7 @@
 // Define pins for other components
 const int PIRSensorPin = 2;
 const int servoPin = 6;
-const int LEDPin = 13;
+const int redLEDPin = 13;
 const int greenLEDPin = 4;
 const int buzzerPin = 3;
 
@@ -40,7 +40,7 @@ void setup() {
 
   // Set pins for other components
   pinMode(PIRSensorPin, INPUT);
-  pinMode(LEDPin, OUTPUT);
+  pinMode(redLEDPin, OUTPUT);
   pinMode(greenLEDPin, OUTPUT);
   pinMode(buzzerPin, OUTPUT);
 
@@ -91,9 +91,16 @@ void loop() {
     servo.write(lockPosition);
     digitalWrite(greenLEDPin, LOW);
   } else {
+    // Door stay locked and turn on the red LED 
     Serial.println("Invalid RFID card. Access denied.");
-  }
+    digitalWrite(redLEDPin, HIGH);
+    delay(unlockDuration-2000);
 
+    // door is still locked and turn off the red LED
+    Serial.println("Stay outside :D ...");
+    servo.write(lockPosition);
+    digitalWrite(redLEDPin, LOW);
+  }
   // Halt the RFID card
   rfid.PICC_HaltA();
 }
