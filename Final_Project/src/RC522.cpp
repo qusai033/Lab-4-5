@@ -4,11 +4,11 @@
 #include <Servo.h>
 
 // Define the RFID module pins
-#define SDA_PIN 10
-#define RST_PIN 9
-#define SCK_PIN 13
-#define MISO_PIN 12
-#define MOSI_PIN 11
+#define SDA_PIN 53
+#define RST_PIN 5
+#define SCK_PIN 52
+#define MISO_PIN 50
+#define MOSI_PIN 51
 
 // Define pins for other components
 const int PIRSensorPin = 2;
@@ -22,7 +22,7 @@ MFRC522 rfid(SDA_PIN, RST_PIN);
 Servo servo;
 
 // Set the valid RFID card UID
-const byte validCardUID[] = {0x12, 0x34, 0x56, 0xAB}; // Replace with the UID of your valid RFID card
+const byte validCardUID[] = {0x33, 0xC8, 0xE0, 0xA0}; // Replace with the UID of your valid RFID card
 
 // Declare variables
 int lockPosition = 0;   // Locked position for the servo
