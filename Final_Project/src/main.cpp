@@ -6,6 +6,7 @@
 #include "led.h"
 #include "buzzer.h"
 #include "PIR.h"
+#include "rc522.h"
 
 // states for the switch states
 typedef enum states_ {
@@ -25,11 +26,7 @@ typedef enum servoState {
   UNLOCKED
 } servoState;
 
-#define SDA_PIN 53
-#define RST_PIN 8
-#define SCK_PIN 52
-#define MISO_PIN 50
-#define MOSI_PIN 51
+const uint8_t key[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; // Replace with your key
 
 alarmSound alarmStatus = ALARMOFF;
 servoState isLocked = UNLOCKED;
@@ -45,97 +42,107 @@ int main()
   initTimer1();
   initTimer0();
   initPIR();
-
+  initRC522();
 
   sei(); // activate global interrupts
   while (1)
   {
-  // Check if the scanned RFID card matches the valid RFID card
+    uint8_t tag[5];
+    bool tagFound = readTag(tag);
+    bool tagAuthenticated = false;
 
-  if(isLocked == LOCKED){
-    setLocked(true);
-    alternateLED(false);
-    Serial.println("Locked");
-    if((PINH & ( 1 << PINH4))){
-      motionCounter++;
-      delayS(1);
-      if(motionCounter == 3){
-        alarmStatus = ALARMON;
+    if (tagFound) {
+      tagAuthenticated = authenticateTag(tag, key);
+      haltTag();
+    }
+
+    if(tagAuthenticated){
+      isLocked = (isLocked == LOCKED) ? UNLOCKED : LOCKED;
+    }
+
+    if(isLocked == LOCKED){
+      setLocked(true);
+      alternateLED(false);
+      Serial.println("Locked");
+      if((PINH & ( 1 << PINH4))){
+        motionCounter++;
+        delayS(1);
+        if(motionCounter == 3){
+          alarmStatus = ALARMON;
+        }
+      }
+      else{
+        motionCounter = 0;
       }
     }
     else{
-      motionCounter = 0;
+      setLocked(false);
+      alternateLED(true);
+      Serial.println("Unlocked");
     }
-  }
-  else{
-    setLocked(false);
-    alternateLED(true);
-    Serial.println("Unlocked");
-  }
 
-      if (alarmStatus == ALARMON)
-      {
-        Serial.println("Alarm on");
-        buzzerOn(true);
-      }
-      else
-      {
-        Serial.println("Alarm off");
-        buzzerOn(false);
-      }
-      
+    if (alarmStatus == ALARMON)
+    {
+      Serial.println("Alarm on");
+      buzzerOn(true);
     }
+    else
+    {
+      Serial.println("Alarm off");
+      buzzerOn(false);
+    }
+  }
   return 0;
 }
 
 ISR(PCINT0_vect){
-    if(alarmStatus == ALARMON){
-      state state = WAIT_PRESS;
-      bool debouncing = true;
+  if(alarmStatus == ALARMON){
+    state state = WAIT_PRESS;
+    bool debouncing = true;
 
-      while(debouncing){
-        if(state == WAIT_PRESS){
-          delayMs(1);
+    while(debouncing){
+      if(state == WAIT_PRESS){
+        delayMs(1);
         state = DEBOUNCE_PRESS;
-        }
-        else if(state == DEBOUNCE_PRESS){
-          delayMs(1);
-          state = WAIT_RELEASE;
-        }
-        else if(state == WAIT_RELEASE){
-          delayMs(1);
+      }
+      else if(state == DEBOUNCE_PRESS){
+        delayMs(1);
+        state = WAIT_RELEASE;
+      }
+      else if(state == WAIT_RELEASE){
+        delayMs(1);
         state = DEBOUNCE_RELEASE;
-          alarmStatus = ALARMOFF;
-          motionCounter = 0;
-        }
-        else if(state == DEBOUNCE_RELEASE){
-          delayMs(1);
+        alarmStatus = ALARMOFF;
+        motionCounter = 0;
+      }
+      else if(state == DEBOUNCE_RELEASE){
+        delayMs(1);
         debouncing = false;
-        }
       }
     }
-    else if(isLocked == UNLOCKED){
-      state state = WAIT_PRESS;
-      bool debouncing = true;
+  }
+  else if(isLocked == UNLOCKED){
+    state state = WAIT_PRESS;
+    bool debouncing = true;
 
-      while(debouncing){
-        if(state == WAIT_PRESS){
-          delayMs(1);
+    while(debouncing){
+      if(state == WAIT_PRESS){
+        delayMs(1);
         state = DEBOUNCE_PRESS;
-        }
-        else if(state == DEBOUNCE_PRESS){
-          delayMs(1);
-          state = WAIT_RELEASE;
-        }
-        else if(state == WAIT_RELEASE){
-          delayMs(1);
+      }
+      else if(state == DEBOUNCE_PRESS){
+        delayMs(1);
+        state = WAIT_RELEASE;
+      }
+      else if(state == WAIT_RELEASE){
+        delayMs(1);
         state = DEBOUNCE_RELEASE;
-          isLocked = LOCKED;
-        }
-        else if(state == DEBOUNCE_RELEASE){
-          delayMs(1);
+        isLocked = LOCKED;
+      }
+      else if(state == DEBOUNCE_RELEASE){
+        delayMs(1);
         debouncing = false;
-        }
-     }
+      }
+    }
   }
 }
