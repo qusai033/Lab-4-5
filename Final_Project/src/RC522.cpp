@@ -1,67 +1,52 @@
-#include <Arduino.h>
+#include "RC522.h"
+#include <avr/io.h>
+#include <util/delay.h>
 
-// Define pins for custom SPI communication
-const int SDA_PIN = 51; // MOSI
-const int SCK_PIN = 52; // SCK
-const int MISO_PIN = 50; // MISO
-const int RST_PIN = 5; // RST
-const int SS_PIN = 53; // SS (slave select)
+#define RC522_SS_PIN PORTB2
+#define RC522_RST_PIN PORTB1
 
-const int UNLOCK_PIN = 8; // Unlock signal pin
+#define RC522_COMMAND_READ 0x30
+#define RC522_COMMAND_AUTH 0x60
+#define RC522_COMMAND_HALT 0x50
 
-// Add your authorized key here
-const byte AUTHORIZED_KEY[4] = {0x12, 0x34, 0x56, 0x78};
+void initRC522() {
+    // Initialize SPI
+    // Set MOSI, SCK and SS as output
+    DDRB |= (1 << DDB3) | (1 << DDB5) | (1 << DDB2);
+    // Set MISO as input
+    DDRB &= ~(1 << DDB4);
 
-void setup() {
-  pinMode(SDA_PIN, OUTPUT);
-  pinMode(SCK_PIN, OUTPUT);
-  pinMode(MISO_PIN, INPUT);
-  pinMode(RST_PIN, OUTPUT);
-  pinMode(SS_PIN, OUTPUT);
+    // Enable SPI, set as master, and set clock rate
+    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
 
-  pinMode(UNLOCK_PIN, OUTPUT);
+    // Set reset pin as output
+    DDRB |= (1 << DDB1);
 
-  digitalWrite(SS_PIN, HIGH); // Deselect the RC522
-  digitalWrite(SCK_PIN, LOW); // Set clock to low
+    // Reset RC522
+    PORTB &= ~(1 << RC522_RST_PIN);
+    _delay_ms(10);
+    PORTB |= (1 << RC522_RST_PIN);
+    _delay_ms(10);
 
-  rc522_init();
+    // Initialization code for RC522
+    // ...
 }
 
-void loop() {
-  byte received_key[4];
+bool readTag(uint8_t *tag) {
+    // Implement the read function for RC522 using SPI communication
+    // ...
 
-  // Read RFID tag and store the key in the received_key array
-  if (read_rfid_tag(received_key)) {
-    if (keys_match(received_key, AUTHORIZED_KEY)) {
-      unlock_system();
-    } else {
-      deny_access();
-    }
-  }
+    return false; // Return true if a tag is read successfully, otherwise return false
 }
 
-// Checks if two keys are equal
-bool keys_match(const byte *key1, const byte *key2) {
-  for (int i = 0; i < 4; i++) {
-    if (key1[i] != key2[i]) {
-      return false;
-    }
-  }
-  return true;
+bool authenticateTag(const uint8_t *tag, const uint8_t *key) {
+    // Implement the authenticate function for RC522 using SPI communication
+    // ...
+
+    return false; // Return true if authentication is successful, otherwise return false
 }
 
-// Unlocks the system
-void unlock_system() {
-  digitalWrite(UNLOCK_PIN, HIGH); // Send the unlock signal
-}
-
-// Denies access
-void deny_access() {
-  digitalWrite(UNLOCK_PIN, LOW); // Send the lock signal
-}
-
-// Reads an RFID tag and stores the key in the provided array
-bool read_rfid_tag(byte *received_key) {
-  // Return true if a tag was successfully read, false otherwise
-  return false;
+void haltTag() {
+    // Implement the halt function for RC522 using SPI communication
+    // ...
 }
