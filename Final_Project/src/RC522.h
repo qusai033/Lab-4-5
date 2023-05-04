@@ -1,19 +1,20 @@
 #ifndef RC522_H
 #define RC522_H
 
-// Define the necessary data types
+#include <avr/io.h>
+
 typedef unsigned char uint8_t;
 typedef unsigned int uint16_t;
 
-// Declare the functions used for RC522
+// SPI communication functions
+void initSPI();
+uint8_t spiTransfer(uint8_t data);
+uint8_t spiTransferBlock(const uint8_t *dataOut, uint8_t dataOutSize, uint8_t *dataIn, uint8_t *dataInSize);
+
+// RC522 functions
 void initRC522();
 bool readTag(uint8_t *tag);
 bool authenticateTag(const uint8_t *tag, const uint8_t *key);
 void haltTag();
 
-// Declare the helper functions used for SPI communication
-void spiTransfer(uint8_t *sendData, uint8_t *receiveData, uint8_t length);
-void spiWriteRegister(uint8_t reg, uint8_t data);
-void delayMs(uint16_t delay);
-
-#endif
+#endif // RC522_H
