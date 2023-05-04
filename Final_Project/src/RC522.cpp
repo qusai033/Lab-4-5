@@ -58,60 +58,104 @@ void initRC522() {
 }
 
 bool readTag(uint8_t *tag) {
-    // Implement the read function for RC522 using SPI communication
-    // ...(send the appropriate commands and read the tag data)
-    // adjust this code according to RFID module's datasheet.
+    // This function assumes the tag has a length of 5 bytes (40 bits)
+    uint8_t tagLength = 5;
     
-    uint8_t status;
-    uint8_t buffer[18];
-    uint8_t size = sizeof(buffer);
+    // Select the RC522 by setting SS low
+    PORTB &= ~(1 << RC522_SS_PIN);
 
-    // Send the command to read a tag
-    status = spiTransfer(RC522_COMMAND_READ, NULL, 0, buffer, &size);
+    // Send the command to read the tag
+    // You may need to adjust this according to your RFID module's datasheet
+    SPDR = RC522_COMMAND_READ;
+    while (!(SPSR & (1 << SPIF)));
+    
+    // Send the address you want to read, for example, block 2
+    SPDR = 2;
+    while (!(SPSR & (1 << SPIF)));
 
-    // Check if a tag was successfully read
-    if (status == 0 && size == 18) {
-        // Copy the tag data to the provided buffer
-        for (int i = 0; i < 16; i++) {
-            tag[i] = buffer[i];
-        }
+    // Read the tag data
+    for (uint8_t i = 0; i < tagLength; i++) {
+        SPDR = 0; // Send dummy byte to receive data
+        while (!(SPSR & (1 << SPIF)));
+        tag[i] = SPDR;
+    }
+
+    // Deselect the RC522 by setting SS high
+    PORTB |= (1 << RC522_SS_PIN);
+
+    // Check if the tag was read successfully
+    if (tag[0] != 0 && tag[1] != 0 && tag[2] != 0 && tag[3] != 0 && tag[4] != 0) {
         return true;
     } else {
-        return false; // Return true if a tag is read successfully, otherwise return false
+        return false;
     }
 }
 
 bool authenticateTag(const uint8_t *tag, const uint8_t *key) {
-    // Implement the authenticate function for RC522 using SPI communication
-    // ...(send the authentication command and verify the response)
-    // adjust this code according to RFID module's datasheet.
-    
     uint8_t status;
-    uint8_t buffer[2];
-    uint8_t size = sizeof(buffer);
+    uint8_t keyLength = 6; // The key length for MIFARE Classic is 6 bytes
+    uint8_t blockAddress = 2; // The block you want to authenticate (change as needed)
+
+    // Select the RC522 by setting SS low
+    PORTB &= ~(1 << RC522_SS_PIN);
 
     // Send the command to authenticate the tag
-    uint8_t authCommand[12] = {RC522_COMMAND_AUTH, 0x60, 0, 4};
-    for (int i = 0; i < 4; i++) {
-        authCommand[i+4] = tag[i];
-        authCommand[i+8] = key[i];
-    }
-    status = spiTransferBlock(authCommand, sizeof(authCommand), buffer, &size);
+    SPDR = RC522_COMMAND_AUTH;
+    while (!(SPSR & (1 << SPIF)));
 
-    // Check if authentication was successful
-    if (status == 0 && size == 2 && buffer[0] == 0x00 && buffer[1] == 0x00) {
+    // Send the authentication mode (e.g., 0x60 for MIFARE Classic key A)
+    SPDR = 0x60;
+    while (!(SPSR & (1 << SPIF)));
+
+    // Send the block address
+    SPDR = blockAddress;
+    while (!(SPSR & (1 << SPIF)));
+
+    // Send the key
+    for (uint8_t i = 0; i < keyLength; i++) {
+        SPDR = key[i];
+        while (!(SPSR & (1 << SPIF)));
+    }
+
+    // Send the tag (UID)
+    for (uint8_t i = 0; i < 4; i++) {
+        SPDR = tag[i];
+        while (!(SPSR & (1 << SPIF)));
+    }
+
+    // Read the status
+    SPDR = 0; // Send dummy byte to receive status
+    while (!(SPSR & (1 << SPIF)));
+    status = SPDR;
+
+    // Deselect the RC522 by setting SS high
+    PORTB |= (1 << RC522_SS_PIN);
+
+    // Check if the tag was authenticated successfully
+    if (status == 0) {
         return true;
     } else {
-        return false;// Return true if authentication is successful, otherwise return false
+        return false;
     }
 }
 
+
 void haltTag() {
-    // Implement the halt function for RC522 using SPI communication
-    // ...(send the halt command to stop communication with the tag)
-    // adjust this code according to RFID module's datasheet.
-    
-    
-    // Send the command to halt communication with the tag
-    spiTransfer(RC522_COMMAND_HALT, NULL, 0, NULL, NULL);
+    // Select the RC522 by setting SS low
+    PORTB &= ~(1 << RC522_SS_PIN);
+
+    // Send the command to halt the tag
+    SPDR = RC522_COMMAND_HALT;
+    while (!(SPSR & (1 << SPIF)));
+
+    // Send the CRC bytes
+    SPDR = 0x93; // CRC byte 1
+    while (!(SPSR & (1 << SPIF)));
+
+    SPDR = 0x70; // CRC byte 2
+    while (!(SPSR & (1 << SPIF)));
+
+    // Deselect the RC522 by setting SS high
+    PORTB |= (1 << RC522_SS_PIN);
 }
+
