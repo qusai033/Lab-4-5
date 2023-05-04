@@ -26,7 +26,7 @@ typedef enum servoState {
   UNLOCKED
 } servoState;
 
-const uint8_t key[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; // Replace with your key
+const uint8_t key[] = {0x33, 0xC8, 0xE0, 0xA0}; // Replace with your key
 
 alarmSound alarmStatus = ALARMOFF;
 servoState isLocked = UNLOCKED;
