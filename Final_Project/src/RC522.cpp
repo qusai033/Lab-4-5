@@ -24,9 +24,9 @@ void initRC522() {
 
     // Reset RC522
     PORTB &= ~(1 << RC522_RST_PIN);
-    _delay_ms(10);
+    delayMs(10);
     PORTB |= (1 << RC522_RST_PIN);
-    _delay_ms(10);
+    delayMs(10);
 
     // Initialization code for RC522
     // ...(initialize registers and perform necessary configurations)
