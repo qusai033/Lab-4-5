@@ -29,24 +29,27 @@ void initRC522() {
     _delay_ms(10);
 
     // Initialization code for RC522
-    // ...
+    // ...(initialize registers and perform necessary configurations)
 }
 
 bool readTag(uint8_t *tag) {
     // Implement the read function for RC522 using SPI communication
-    // ...
+    // ...(send the appropriate commands and read the tag data)
+    // adjust this code according to RFID module's datasheet.
 
     return false; // Return true if a tag is read successfully, otherwise return false
 }
 
 bool authenticateTag(const uint8_t *tag, const uint8_t *key) {
     // Implement the authenticate function for RC522 using SPI communication
-    // ...
+    // ...(send the authentication command and verify the response)
+    // adjust this code according to RFID module's datasheet.
 
     return false; // Return true if authentication is successful, otherwise return false
 }
 
 void haltTag() {
     // Implement the halt function for RC522 using SPI communication
-    // ...
+    // ...(send the halt command to stop communication with the tag)
+    // adjust this code according to RFID module's datasheet.
 }
