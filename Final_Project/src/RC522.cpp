@@ -89,7 +89,7 @@ void initRC522() {
 // Function to read the RFID tag
 bool readTag(uint8_t *tag) {
     // This function assumes the tag has a length of 4 bytes (32 bits)
-    uint8_t tagLength = 5;
+    uint8_t tagLength = 4;
     
     // Select the RC522 by setting SS low
     PORTB &= ~(1 << RC522_SS_PIN);
@@ -113,7 +113,7 @@ bool readTag(uint8_t *tag) {
     PORTB |= (1 << RC522_SS_PIN);
 
     // Check if the tag was read successfully
-    if (tag[0] != 0 && tag[1] != 0 && tag[2] != 0 && tag[3] != 0 && tag[4] != 0) {
+    if (tag[0] != 0 && tag[1] != 0 && tag[2] != 0 && tag[3] != 0) {
         return true;
     } else {
         return false;
