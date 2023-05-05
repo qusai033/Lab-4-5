@@ -29,6 +29,7 @@ int lockPosition = 0;   // Locked position for the servo
 int unlockPosition = 90; // Unlocked position for the servo
 unsigned long unlockDuration = 5000; // Duration (in ms) to keep the door unlocked before locking it again
 int motionState = LOW;
+bool accessGranted = false;
 
 void setup() {
   // Initialize the serial communication
@@ -54,7 +55,7 @@ void setup() {
 void loop() {
   // Check for motion detection
   motionState = digitalRead(PIRSensorPin);
-  if (motionState == HIGH) {
+  if (motionState == HIGH && accessGranted = false) {
     digitalWrite(buzzerPin, HIGH);
   } else {
     digitalWrite(buzzerPin, LOW);
@@ -85,8 +86,11 @@ void loop() {
     servo.write(unlockPosition);
     digitalWrite(greenLEDPin, HIGH);
     delay(unlockDuration);
+    accessGranted = true;
 
     // Lock the door and turn off the green LED
+    delayMs(5000);
+    accessGranted = false;
     Serial.println("Locking the door...");
     servo.write(lockPosition);
     digitalWrite(greenLEDPin, LOW);
