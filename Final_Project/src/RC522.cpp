@@ -33,25 +33,6 @@ void initRC522() {
     DDRB |= (1 << RC522_SS_PIN);
     
     
-    // Set SPI mode
-    spiWriteRegister(0x01, 0x00);
-
-    // Set Timer
-    spiWriteRegister(0x2a, 0x8d);
-    spiWriteRegister(0x2b, 0x3e);
-
-    // Set Antenna Gain
-    spiWriteRegister(0x0c, 0x00);
-
-    // Turn on Antenna
-    spiWriteRegister(0x14, 0x03);
-
-    // Disable CRC
-    spiWriteRegister(0x03, 0x80);
-
-    // Clear FIFO buffer
-    spiWriteRegister(0x0f, 0x80);
-    spiWriteRegister(0x0f, 0x00);
 
     // Wait for the RC522 to finish initializing
     delayMs(100);
