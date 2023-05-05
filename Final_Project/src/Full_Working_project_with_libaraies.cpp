@@ -89,7 +89,7 @@ void loop() {
     accessGranted = true;
 
     // Lock the door and turn off the green LED
-    delayMs(5000);
+    _delay_ms(5000);
     accessGranted = false;
     Serial.println("Locking the door...");
     servo.write(lockPosition);
