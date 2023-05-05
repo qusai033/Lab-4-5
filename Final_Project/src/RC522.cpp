@@ -2,20 +2,23 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+// Define the pin assignments for RC522
 #define RC522_SS_PIN PORTB2
 #define RC522_RST_PIN PORTB1
 
+// Define commands for reading, authenticating, and halting the tag
 #define RC522_COMMAND_READ 0x30
 #define RC522_COMMAND_AUTH 0x60
 #define RC522_COMMAND_HALT 0x50
 
-
+// Function to reset the RC522
 void reset() {
     writeRegister(MFRC522_COMMAND_REG, MFRC522_CMD_SOFT_RESET);
     _delay_ms(50);
     while (readRegister(MFRC522_COMMAND_REG) & (1 << 4)) {}
 }
 
+// Function to turn on the antenna of the RC522
 void antennaOn() {
     uint8_t value = readRegister(MFRC522_TX_CONTROL_REG);
     if ((value & 0x03) != 0x03) {
@@ -23,22 +26,25 @@ void antennaOn() {
     }
 }
 
+// Function to write a register of the RC522
 void writeRegister(uint8_t reg, uint8_t value) {
-    PORTB &= ~(1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, LOW);
-    SPI.transfer(reg & 0x7F);
-    SPI.transfer(value);
-    PORTB |= (1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, HIGH);
+    PORTB &= ~(1 << RC522_SS_PIN); // Set the chip select pin low
+    SPI.transfer(reg & 0x7F); // Send the register address
+    SPI.transfer(value); // Send the value
+    PORTB |= (1 << RC522_SS_PIN); // Set the chip select pin high
 }
 
+// Function to read a register of the RC522
 uint8_t readRegister(uint8_t reg) {
     uint8_t data;
-    PORTB &= ~(1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, LOW);
-    SPI.transfer(reg & 0x7F);
-    data = SPI.transfer(0x00);
-    PORTB |= (1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, HIGH);
+    PORTB &= ~(1 << RC522_SS_PIN); // Set the chip select pin low
+    SPI.transfer(reg & 0x7F); // Send the register address
+    data = SPI.transfer(0x00); // Send a dummy byte to receive data
+    PORTB |= (1 << RC522_SS_PIN); // Set the chip select pin high
     return data;
 }
 
+// Function to initialize the RC522
 void initRC522() {
     // Initialize SPI
     // Set MOSI, SCK, and SS as output
@@ -49,7 +55,7 @@ void initRC522() {
     // Enable SPI, set as master, and set clock rate
     SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
 
-    // Set reset pin as output
+        // Set reset pin as output
     DDRB |= (1 << DDB1);
 
     // Reset RC522
@@ -59,8 +65,8 @@ void initRC522() {
     _delay_ms(10);
 
     // Additional initialization
-    PORTB |= (1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, HIGH);
-    PORTB |= (1 << RC522_RST_PIN); // digitalWrite(_resetPin, HIGH);
+    PORTB |= (1 << RC522_SS_PIN); // Set the chip select pin high
+    PORTB |= (1 << RC522_RST_PIN); // Set the reset pin high
 
     reset();
 
@@ -75,8 +81,7 @@ void initRC522() {
     antennaOn();
 }
 
-
-
+// Function to read the RFID tag
 bool readTag(uint8_t *tag) {
     // This function assumes the tag has a length of 5 bytes (40 bits)
     uint8_t tagLength = 5;
@@ -85,7 +90,6 @@ bool readTag(uint8_t *tag) {
     PORTB &= ~(1 << RC522_SS_PIN);
 
     // Send the command to read the tag
-    // You may need to adjust this according to your RFID module's datasheet
     SPDR = RC522_COMMAND_READ;
     while (!(SPSR & (1 << SPIF)));
     
@@ -111,6 +115,7 @@ bool readTag(uint8_t *tag) {
     }
 }
 
+// Function to authenticate the RFID tag
 bool authenticateTag(const uint8_t *tag, const uint8_t *key) {
     uint8_t status;
     uint8_t keyLength = 6; // The key length for MIFARE Classic is 6 bytes
@@ -131,7 +136,7 @@ bool authenticateTag(const uint8_t *tag, const uint8_t *key) {
     SPDR = blockAddress;
     while (!(SPSR & (1 << SPIF)));
 
-    // Send the key
+        // Send the key
     for (uint8_t i = 0; i < keyLength; i++) {
         SPDR = key[i];
         while (!(SPSR & (1 << SPIF)));
@@ -159,7 +164,7 @@ bool authenticateTag(const uint8_t *tag, const uint8_t *key) {
     }
 }
 
-
+// Function to halt the RFID tag
 void haltTag() {
     // Select the RC522 by setting SS low
     PORTB &= ~(1 << RC522_SS_PIN);
@@ -178,4 +183,3 @@ void haltTag() {
     // Deselect the RC522 by setting SS high
     PORTB |= (1 << RC522_SS_PIN);
 }
-
