@@ -1,10 +1,5 @@
 #include "RC522.h"
-#include <avr/io.h>
-#include <util/delay.h>
 
-// Define the pin assignments for RC522
-#define RC522_SS_PIN PORTB2
-#define RC522_RST_PIN PORTB1
 
 // Define commands for reading, authenticating, and halting the tag
 #define RC522_COMMAND_READ 0x30
@@ -48,15 +43,15 @@ uint8_t readRegister(uint8_t reg) {
 void initRC522() {
     // Initialize SPI
     // Set MOSI, SCK, and SS as output
-    DDRB |= (1 << DDB3) | (1 << DDB5) | (1 << DDB2);
+    DDRB |= (1 << DDB2) | (1 << DDB1) | (1 << DDB0);
     // Set MISO as input
-    DDRB &= ~(1 << DDB4);
+    DDRB &= ~(1 << DDB3);
 
     // Enable SPI, set as master, and set clock rate
     SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
 
         // Set reset pin as output
-    DDRB |= (1 << DDB1);
+    DDRB |= (1 << DDE3);
 
     // Reset RC522
     PORTB &= ~(1 << RC522_RST_PIN);
@@ -83,8 +78,8 @@ void initRC522() {
 
 // Function to read the RFID tag
 bool readTag(uint8_t *tag) {
-    // This function assumes the tag has a length of 5 bytes (40 bits)
-    uint8_t tagLength = 5;
+    // This function assumes the tag has a length of 3 bytes (40 bits)
+    uint8_t tagLength = 3;
     
     // Select the RC522 by setting SS low
     PORTB &= ~(1 << RC522_SS_PIN);
