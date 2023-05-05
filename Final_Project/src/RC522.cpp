@@ -39,6 +39,16 @@ uint8_t readRegister(uint8_t reg) {
     return data;
 }
 
+bool compareTags(const uint8_t *tag1, const uint8_t *tag2, uint8_t length) {
+    for (uint8_t i = 0; i < length; i++) {
+        if (tag1[i] != tag2[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
 // Function to initialize the RC522
 void initRC522() {
     // Initialize SPI
