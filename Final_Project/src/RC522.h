@@ -1,12 +1,14 @@
 #ifndef RC522_H
 #define RC522_H
 
-#include <avr/io.h>
 #include <stdbool.h>
+#include "SPI.h"
+#include <avr/io.h>
+#include <util/delay.h>
 
 // Define the pin assignments for RC522
-#define RC522_SS_PIN PORTB2
-#define RC522_RST_PIN PORTB1
+#define RC522_SS_PIN PORTB0
+#define RC522_RST_PIN PORTE3
 
 // Define commands for reading, authenticating, and halting the tag
 #define RC522_COMMAND_READ 0x30
