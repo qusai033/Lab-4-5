@@ -9,9 +9,39 @@
 #define RC522_COMMAND_AUTH 0x60
 #define RC522_COMMAND_HALT 0x50
 
+
+void reset() {
+    writeRegister(MFRC522_COMMAND_REG, MFRC522_CMD_SOFT_RESET);
+    _delay_ms(50);
+    while (readRegister(MFRC522_COMMAND_REG) & (1 << 4)) {}
+}
+
+void antennaOn() {
+    uint8_t value = readRegister(MFRC522_TX_CONTROL_REG);
+    if ((value & 0x03) != 0x03) {
+        writeRegister(MFRC522_TX_CONTROL_REG, value | 0x03);
+    }
+}
+
+void writeRegister(uint8_t reg, uint8_t value) {
+    PORTB &= ~(1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, LOW);
+    SPI.transfer(reg & 0x7F);
+    SPI.transfer(value);
+    PORTB |= (1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, HIGH);
+}
+
+uint8_t readRegister(uint8_t reg) {
+    uint8_t data;
+    PORTB &= ~(1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, LOW);
+    SPI.transfer(reg & 0x7F);
+    data = SPI.transfer(0x00);
+    PORTB |= (1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, HIGH);
+    return data;
+}
+
 void initRC522() {
     // Initialize SPI
-    // Set MOSI, SCK and SS as output
+    // Set MOSI, SCK, and SS as output
     DDRB |= (1 << DDB3) | (1 << DDB5) | (1 << DDB2);
     // Set MISO as input
     DDRB &= ~(1 << DDB4);
@@ -24,19 +54,28 @@ void initRC522() {
 
     // Reset RC522
     PORTB &= ~(1 << RC522_RST_PIN);
-    delayMs(10);
+    _delay_ms(10);
     PORTB |= (1 << RC522_RST_PIN);
-    delayMs(10);
+    _delay_ms(10);
 
-    // Initialization code for RC522
-    // Set SS pin as output
-    DDRB |= (1 << RC522_SS_PIN);
-    
-    
+    // Additional initialization
+    PORTB |= (1 << RC522_SS_PIN); // digitalWrite(_chipSelectPin, HIGH);
+    PORTB |= (1 << RC522_RST_PIN); // digitalWrite(_resetPin, HIGH);
 
-    // Wait for the RC522 to finish initializing
-    delayMs(100);
+    reset();
+
+    writeRegister(MFRC522_T_MODE_REG, 0x8D);
+    writeRegister(MFRC522_T_PRESCALER_REG, 0x3E);
+    writeRegister(MFRC522_T_RELOAD_REGL, 30);
+    writeRegister(MFRC522_T_RELOAD_REGH, 0);
+
+    writeRegister(MFRC522_TX_AUTO_REG, 0x40);
+    writeRegister(MFRC522_MODE_REG, 0x3D);
+
+    antennaOn();
 }
+
+
 
 bool readTag(uint8_t *tag) {
     // This function assumes the tag has a length of 5 bytes (40 bits)
