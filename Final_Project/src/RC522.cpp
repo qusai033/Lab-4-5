@@ -113,7 +113,7 @@ bool readTag(uint8_t *tag) {
 // Function to authenticate the RFID tag
 bool authenticateTag(const uint8_t *tag, const uint8_t *key) {
     uint8_t status;
-    uint8_t keyLength = 6; // The key length for MIFARE Classic is 6 bytes
+    uint8_t keyLength = 4; // The key length for MIFARE Classic is 6 bytes
     uint8_t blockAddress = 2; // The block you want to authenticate (change as needed)
 
     // Select the RC522 by setting SS low
