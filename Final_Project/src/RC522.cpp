@@ -1,10 +1,26 @@
 #include "RC522.h"
 
 
+// Define the pin assignments for RC522
+#define RC522_SS_PIN PORTB0
+#define RC522_RST_PIN PORTE3
+
 // Define commands for reading, authenticating, and halting the tag
 #define RC522_COMMAND_READ 0x30
 #define RC522_COMMAND_AUTH 0x60
 #define RC522_COMMAND_HALT 0x50
+
+// Define missing constants
+#define MFRC522_COMMAND_REG 0x01
+#define MFRC522_CMD_SOFT_RESET 0x0F
+#define MFRC522_TX_CONTROL_REG 0x14
+#define MFRC522_T_MODE_REG 0x2A
+#define MFRC522_T_PRESCALER_REG 0x2B
+#define MFRC522_T_RELOAD_REGL 0x2C
+#define MFRC522_T_RELOAD_REGH 0x2D
+#define MFRC522_TX_AUTO_REG 0x15
+#define MFRC522_MODE_REG 0x11
+
 
 // Function to reset the RC522
 void reset() {
