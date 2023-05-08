@@ -48,10 +48,14 @@ void setup() {
   pinMode(redLEDPin, OUTPUT);
   pinMode(greenLEDPin, OUTPUT);
   pinMode(buzzerPin, OUTPUT);
+  
+  
   initPIR();
   initLED();
   initBuzzer();
   initPWMTimer3();
+  
+  
   setLocked(locked);
 
   // Attach the servo motor to the specified pin and set it to the locked position
@@ -66,10 +70,10 @@ void loop() {
   motionState = digitalRead(PIRSensorPin);
   if (motionState == HIGH) {
     buzzerOn(false);
-    //digitalWrite(buzzerPin, HIGH);
+    digitalWrite(buzzerPin, HIGH);
   } else {
     buzzerOn(true);
-    //digitalWrite(buzzerPin, LOW);
+    digitalWrite(buzzerPin, LOW);
   }
 
   // Check if a new RFID card is present
@@ -94,9 +98,8 @@ void loop() {
   if (isCardValid) {
     // Unlock the door and turn on the green LED
     Serial.println("Valid RFID card detected! Unlocking the door...");
-    //servo.write(unlockPosition);
     setLocked(false);
-    //digitalWrite(greenLEDPin, HIGH);
+    digitalWrite(greenLEDPin, HIGH);
     alternateLED(true);
     delay(unlockDuration);
 
@@ -110,15 +113,14 @@ void loop() {
   } else {
     // Door stay locked and turn on the red LED 
     Serial.println("Invalid RFID card. Access denied.");
-    //digitalWrite(redLEDPin, HIGH);
+    digitalWrite(redLEDPin, HIGH);
     alternateLED(false);
     delay(unlockDuration-2000);
 
     // door is still locked and turn off the red LED
     Serial.println("Stay outside :D ...");
-    //servo.write(lockPosition);
     setLocked(true);
-    //digitalWrite(redLEDPin, LOW);
+    digitalWrite(redLEDPin, LOW);
   }
   // Halt the RFID card
   rfid.PICC_HaltA();
