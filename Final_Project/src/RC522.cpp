@@ -73,10 +73,10 @@ void initRC522() {
     // Set MISO as input
     DDRB &= ~(1 << DDB3);
 
-    // Enable SPI, set as master, and set clock rate
-    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
+    // Set clock polarity and phase, set data order, and set clock rate
+    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0); // MSB first, clock rate = fosc/16
 
-        // Set reset pin as output
+    // Set reset pin as output
     DDRB |= (1 << DDE3);
 
     // Reset RC522
