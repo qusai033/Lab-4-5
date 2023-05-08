@@ -15,9 +15,9 @@
 
 Define pins for other components
 const int PIRSensorPin = 7;
-const int servoPin = 6;
-const int redLEDPin = 13;
-const int greenLEDPin = 4;
+const int servoPin = 3;
+const int redLEDPin = 6;
+const int greenLEDPin = 8;
 const int buzzerPin = 4;
 
 // Create instances of the MFRC522 and Servo libraries
