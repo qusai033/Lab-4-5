@@ -13,7 +13,6 @@ void writeRegister(uint8_t reg, uint8_t value);
 uint8_t readRegister(uint8_t reg);
 void initRC522();
 bool readTag(uint8_t *tag);
-bool compareTags(const uint8_t *tag1, const uint8_t *tag2, uint8_t length);
 bool authenticateTag(const uint8_t *tag, const uint8_t *key);
 void haltTag();
 
