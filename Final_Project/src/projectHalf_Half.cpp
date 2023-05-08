@@ -57,6 +57,10 @@ void setup() {
   buzzerOn(false);
   alternateLED(false);
 
+  setLocked(true);
+  _delay_ms(1000);
+  setLocked(false);
+
   // Attach the servo motor to the specified pin and set it to the locked position
   //servo.attach(servoPin);
   //servo.write(lockPosition);
@@ -99,7 +103,7 @@ void loop() {
     // Unlock the door and turn on the green LED
     Serial.println("Valid RFID card detected! Unlocking the door...");
     //servo.write(unlockPosition);
-    setLocked(false);
+    setLocked(true);
     alarmStatus = false;
     digitalWrite(greenLEDPin, HIGH);
     alternateLED(true);
@@ -111,7 +115,7 @@ void loop() {
     Serial.println("Locking the door...");
     //_delay_ms(1000);
     //servo.write(lockPosition);
-    setLocked(true);
+    setLocked(false);
     digitalWrite(greenLEDPin, LOW);
     alternateLED(false);
   } else {
@@ -125,7 +129,7 @@ void loop() {
     // door is still locked and turn off the red LED
     Serial.println("Stay outside :D ...");
     //servo.write(lockPosition);
-    setLocked(true);
+    setLocked(false);
     //digitalWrite(redLEDPin, LOW);
   }
   // Halt the RFID card
