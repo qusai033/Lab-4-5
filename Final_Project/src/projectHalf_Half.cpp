@@ -1,6 +1,6 @@
 // Include the necessary libraries
 #include <SPI.h>
-#include "PIR.h"
+//#include "PIR.h"
 #include "led.h"
 #include "buzzer.h"
 #include "pwm.h"
@@ -13,15 +13,16 @@
 #define MISO_PIN 50
 #define MOSI_PIN 51
 
-Define pins for other components
+// Define pins for other components
 const int PIRSensorPin = 7;
-const int servoPin = 3;
-const int redLEDPin = 6;
+//const int servoPin = 6;
+//const int redLEDPin = 13;
 const int greenLEDPin = 8;
-const int buzzerPin = 4;
+//const int buzzerPin = 4;
 
 // Create instances of the MFRC522 and Servo libraries
 MFRC522 rfid(SDA_PIN, RST_PIN);
+//Servo servo;
 
 // Set the valid RFID card UID
 const byte validCardUID[] = {0x41, 0xFD, 0x60, 0x22}; // Replace with the UID of your valid RFID card
@@ -33,7 +34,8 @@ unsigned long unlockDuration = 5000; // Duration (in ms) to keep the door unlock
 int motionState = LOW;
 
 // no library variables
-bool locked = true;
+//bool locked = true;
+bool alarmStatus = false;
 
 void setup() {
   // Initialize the serial communication
@@ -45,18 +47,15 @@ void setup() {
 
   // Set pins for other components
   pinMode(PIRSensorPin, INPUT);
-  pinMode(redLEDPin, OUTPUT);
+  //pinMode(redLEDPin, OUTPUT);
   pinMode(greenLEDPin, OUTPUT);
-  pinMode(buzzerPin, OUTPUT);
-  
-  
-  initPIR();
+  //pinMode(buzzerPin, OUTPUT);
+  //initPIR();
   initLED();
   initBuzzer();
   initPWMTimer3();
-  
-  
-  setLocked(locked);
+  buzzerOn(false);
+  alternateLED(false);
 
   // Attach the servo motor to the specified pin and set it to the locked position
   //servo.attach(servoPin);
@@ -66,14 +65,15 @@ void setup() {
 }
 
 void loop() {
+
   // Check for motion detection
   motionState = digitalRead(PIRSensorPin);
   if (motionState == HIGH) {
-    buzzerOn(false);
-    digitalWrite(buzzerPin, HIGH);
-  } else {
     buzzerOn(true);
-    digitalWrite(buzzerPin, LOW);
+    //digitalWrite(buzzerPin, HIGH);
+  } else {
+    buzzerOn(false);
+    //digitalWrite(buzzerPin, LOW);
   }
 
   // Check if a new RFID card is present
@@ -98,29 +98,35 @@ void loop() {
   if (isCardValid) {
     // Unlock the door and turn on the green LED
     Serial.println("Valid RFID card detected! Unlocking the door...");
+    //servo.write(unlockPosition);
     setLocked(false);
+    alarmStatus = false;
     digitalWrite(greenLEDPin, HIGH);
     alternateLED(true);
+    buzzerOn(false);
+
     delay(unlockDuration);
 
     // Lock the door and turn off the green LED
     Serial.println("Locking the door...");
-    _delay_ms(1000);
+    //_delay_ms(1000);
     //servo.write(lockPosition);
     setLocked(true);
-    //digitalWrite(greenLEDPin, LOW);
+    digitalWrite(greenLEDPin, LOW);
     alternateLED(false);
   } else {
     // Door stay locked and turn on the red LED 
     Serial.println("Invalid RFID card. Access denied.");
-    digitalWrite(redLEDPin, HIGH);
+    alarmStatus = true;
+    //digitalWrite(redLEDPin, HIGH);
     alternateLED(false);
     delay(unlockDuration-2000);
 
     // door is still locked and turn off the red LED
     Serial.println("Stay outside :D ...");
+    //servo.write(lockPosition);
     setLocked(true);
-    digitalWrite(redLEDPin, LOW);
+    //digitalWrite(redLEDPin, LOW);
   }
   // Halt the RFID card
   rfid.PICC_HaltA();
