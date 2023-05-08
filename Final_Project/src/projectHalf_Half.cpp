@@ -1,6 +1,6 @@
 // Include the necessary libraries
 #include <SPI.h>
-//#include "PIR.h"
+#include "PIR.h"
 #include "led.h"
 #include "buzzer.h"
 #include "pwm.h"
@@ -13,16 +13,15 @@
 #define MISO_PIN 50
 #define MOSI_PIN 51
 
-// Define pins for other components
+Define pins for other components
 const int PIRSensorPin = 7;
-//const int servoPin = 6;
-//const int redLEDPin = 13;
-//const int greenLEDPin = 4;
-//const int buzzerPin = 4;
+const int servoPin = 6;
+const int redLEDPin = 13;
+const int greenLEDPin = 4;
+const int buzzerPin = 4;
 
 // Create instances of the MFRC522 and Servo libraries
 MFRC522 rfid(SDA_PIN, RST_PIN);
-//Servo servo;
 
 // Set the valid RFID card UID
 const byte validCardUID[] = {0x41, 0xFD, 0x60, 0x22}; // Replace with the UID of your valid RFID card
@@ -46,10 +45,10 @@ void setup() {
 
   // Set pins for other components
   pinMode(PIRSensorPin, INPUT);
-  //pinMode(redLEDPin, OUTPUT);
-  //pinMode(greenLEDPin, OUTPUT);
-  //pinMode(buzzerPin, OUTPUT);
-  //initPIR();
+  pinMode(redLEDPin, OUTPUT);
+  pinMode(greenLEDPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+  initPIR();
   initLED();
   initBuzzer();
   initPWMTimer3();
