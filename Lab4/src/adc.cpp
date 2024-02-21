@@ -1,7 +1,7 @@
 #include "adc.h"
 
 void initADC0(){
-    
+
     // set reference voltage set to AVCC = 5V output.  (we really want to measure 5V output from the 
     // development board to determine what the reference value is for precise calculations)
     ADMUX |= (1 << REFS0);
